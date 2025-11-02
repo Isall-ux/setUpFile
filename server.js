@@ -11,6 +11,17 @@ const app = express();
 
 const PORT = 8383;
 
+// HHTP verb && route  or endpoint
+// HTTP verb -> GET (is used to request data from a server)
+// endpoint -> / (root endpoint)
+
+app.get('/', (req, res)=>{
+    console.log("A request was made to the root endpoint", req.method);
+    res.sendStatus(200)
+})
+
+
+
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
