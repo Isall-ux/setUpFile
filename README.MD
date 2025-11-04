@@ -9,7 +9,6 @@ lalu jalan kan promt ini di bash
 ``` 
 ### hasil folder structure yg didapat
 ```
-    src/
 src/
 ├── config/
 ├── core/
