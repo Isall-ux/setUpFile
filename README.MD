@@ -7,6 +7,23 @@ lalu jalan kan promt ini di bash
 ```
     node expressSetUp
 ``` 
+### hasil folder structure yg didapat
+```
+    src/
+src/
+├── config/
+├── core/
+│   ├── middleware/
+│   └── utils/
+├── features/
+│   └── user/
+│       ├── user.controller.js
+│       ├── user.model.js
+│       └── user.routes.js
+├── app.js
+└── server.js
+```
+
 ### Command yg dapat di gunakan dengan tools yg di sediakan dari set up
 
 ### membuat feature bagi routes, models dan controller
