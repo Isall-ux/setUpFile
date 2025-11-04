@@ -118,8 +118,17 @@ if (!fs.existsSync(createModuleTool)) {
 const path = require("path")
 
 const name = process.argv[2]
+const type = process.argv[3] || "all" // default = all
+
 if (!name) {
-  console.error("Please provide a feature name. Example: node tools/createModule.js user")
+  console.error("Please provide a feature name. Example: npm run models user")
+  process.exit(1)
+}
+
+
+const validTypes = ["all", "controller", "routes", "model"]
+if (!validTypes.includes(type)) {
+  console.error(\`Invalid type "\${type}". Use one of: \${validTypes.join(", ")}\`)
   process.exit(1)
 }
 
@@ -155,9 +164,15 @@ const createFile = (fileName, content) => {
   }
 }
 
-createFile(\`\${name}.controller.js\`, controllerContent)
-createFile(\`\${name}.routes.js\`, routeContent)
-createFile(\`\${name}.model.js\`, modelContent)
+if (type === "all" || type === "controller") {
+  createFile(\`\${name}.controller.js\`, controllerContent)
+}
+if (type === "all" || type === "routes") {
+  createFile(\`\${name}.routes.js\`, routeContent)
+}
+if (type === "all" || type === "model") {
+  createFile(\`\${name}.model.js\`, modelContent)
+}
 
 console.log(\`Feature "\${name}" created successfully!\`)
 `
@@ -176,7 +191,7 @@ const path = require("path")
 
 const name = process.argv[2]
 if (!name) {
-  console.error("Please provide a feature name. Example: node tools/deleteModule.js user")
+  console.error("Please provide a feature name. Example: npm run delete user")
   process.exit(1)
 }
 
