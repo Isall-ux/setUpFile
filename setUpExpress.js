@@ -18,7 +18,7 @@ const folders = [
 // === Helper to run commands ===
 const run = (cmd) => {
   console.log(`Running: ${cmd}`)
-  execSync(cmd, { cwd: projectDir, stdio: "inherit" })
+  execSync(cmd, { cwd: projectDir})
 }
 
 // === Initialize project ===
