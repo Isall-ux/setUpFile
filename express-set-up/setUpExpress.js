@@ -79,6 +79,30 @@ setUpExpress.js
   console.log(".gitignore created")
 }
 
+// === .env ===
+const envPath = path.join(projectDir, ".env")
+if (!fs.existsSync(envPath)) {
+  fs.writeFileSync(
+    envPath,
+    `PORT = 5000
+
+`
+  )
+  console.log(".env created")
+}
+
+// === .env.example ===
+const envExamplePath = path.join(projectDir, ".env.example")
+if (!fs.existsSync(envExamplePath)) {
+  fs.writeFileSync(
+    envExamplePath,
+    `PORT = 5000
+
+`
+  )
+  console.log(".env.example created")
+}
+
 // === app.js ===
 const appJs = path.join(srcDir, "app.js")
 if (!fs.existsSync(appJs)) {
@@ -105,7 +129,10 @@ const serverJs = path.join(srcDir, "server.js")
 if (!fs.existsSync(serverJs)) {
   fs.writeFileSync(
     serverJs,
-`import app from "./app.js"
+`import dotenv from "dotenv"
+dotenv.config()
+
+import app from "./app.js"
 
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
