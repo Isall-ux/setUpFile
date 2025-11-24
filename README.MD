@@ -22,6 +22,8 @@ src/
 ├── app.js
 └── server.js
 tools/
+    └── createModule.js
+        deleteModule.js
 .env
 .env.example
 .gitignore
