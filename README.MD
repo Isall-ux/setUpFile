@@ -21,6 +21,13 @@ src/
 │       └── user.routes.js
 ├── app.js
 └── server.js
+tools/
+.env
+.env.example
+.gitignore
+package-lock.json
+package.json
+setUpExpress.js
 ```
 
 ### Command yg dapat di gunakan dengan tools yg di sediakan dari set up
