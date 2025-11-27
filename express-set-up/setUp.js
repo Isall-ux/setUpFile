@@ -73,7 +73,7 @@ if (!fs.existsSync(gitIgnorePath)) {
     gitIgnorePath,
     `node_modules
 .env
-setUpExpress.js
+setUp.js
 `
   )
   console.log(".gitignore created")
