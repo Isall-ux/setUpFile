@@ -69,7 +69,7 @@ if [ -d "$SCAFFOLD_DIR" ]; then
   echo ""
   echo -e "  ${YELLOW}${SCAFFOLD_DIR} already exists.${RESET}"
   printf "  Update existing installation? [y/N] "
-  read -r reply || true
+  read -r reply </dev/tty 2>/dev/null || reply=""
   case "${reply:-n}" in
     y|Y) ;;
     *)
