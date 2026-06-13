@@ -1,0 +1,13 @@
+{
+  "name": "__PROJECT_NAME__",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i ./css/global.css -o ./dist/styles.css",
+    "watch:css": "tailwindcss -i ./css/global.css -o ./dist/styles.css --watch"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.0.0"
+  },
+  "author": "__AUTHOR__"
+}

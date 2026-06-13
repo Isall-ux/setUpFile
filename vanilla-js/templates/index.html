@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>__PROJECT_NAME__</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="./css/global.css">
+  <script>
+    window.BASE = (() => {
+      var host = window.location.hostname;
+      if (host === 'localhost' || host === '127.0.0.1') return '';
+      return '__BASE_PATH__';
+    })();
+  </script>
+</head>
+<body>
+  <div id="navbar"></div>
+  <div id="top-bar"></div>
+  <div id="main"></div>
+  <div id="bottom-bar"></div>
+  <div id="footer"></div>
+  <script type="module" src="./js/core/main.js"></script>
+</body>
+</html>
