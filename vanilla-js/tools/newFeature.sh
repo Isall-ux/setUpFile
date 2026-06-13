@@ -26,26 +26,17 @@ echo -e "  ${BOLD}Feature Generator${RESET}"
 echo ""
 
 while true; do
-  read -r -p "  Feature name (kebab-case, e.g. blog): " FEATURE_NAME || true
-  if [[ "$FEATURE_NAME" =~ ^[a-z][a-z0-9]*(-[a-z0-9]+)*$ ]]; then
+  read -r -p "  Feature path (kebab-case, nested with /, e.g. blog or blog/post/comments): " FEATURE_PATH || true
+  if [[ "$FEATURE_PATH" =~ ^[a-z][a-z0-9]*(-[a-z0-9]+)*(/[a-z][a-z0-9]*(-[a-z0-9]+)*)*$ ]]; then
     break
   fi
-  print_error "Must be kebab-case (e.g. user-profile)"
+  print_error "Must be kebab-case segments separated by / (e.g. blog or blog/post/comments)"
 done
 
+FEATURE_NAME="${FEATURE_PATH##*/}"
 FEATURE_PASCAL=$(kebab_to_pascal "$FEATURE_NAME")
-FEATURE_DIR="features/$FEATURE_NAME"
-
-prompt_choice "Feature type:" "Standalone" "Grouped sub-page (under an existing parent)" && feature_type=$? || feature_type=$?
-
-if [ $feature_type -eq 1 ]; then
-  read -r -p "  Parent feature name: " PARENT_NAME || true
-  PARENT_DIR="features/$PARENT_NAME"
-  if [ ! -d "$PARENT_DIR" ]; then
-    print_info "Parent directory '$PARENT_DIR' does not exist — will create"
-  fi
-  FEATURE_DIR="$PARENT_DIR/$FEATURE_NAME"
-fi
+FEATURE_DIR="features/$FEATURE_PATH"
+DEPTH=$(($(tr -dc '/' <<< "$FEATURE_PATH" | wc -c) + 1))
 
 echo ""
 prompt_choice "Data scope:" "New feature-specific JSON" "Use existing shared JSON" && data_choice=$? || data_choice=$?
@@ -67,10 +58,12 @@ echo ""
 mkdir -p "$FEATURE_DIR/js"
 mkdir -p "$FEATURE_DIR/css"
 
+UP="$(printf '../%.0s' $(seq 1 $DEPTH))"
+
 DATA_IMPORT=""
 FETCH_LINE=""
 if [ $data_choice -eq 0 ]; then
-  DATA_IMPORT="import { fetchData } from '../../js/utils/api.js';"
+  DATA_IMPORT="import { fetchData } from '${UP}js/utils/api.js';"
   FETCH_LINE="const data = await fetchData('/${FEATURE_DIR}/${FEATURE_NAME}.json');"
 else
   FETCH_LINE="// Data from: ${JSON_PATH}"
@@ -78,7 +71,7 @@ fi
 
 write_if_missing "$FEATURE_DIR/$FEATURE_NAME.js" << EOF
 ${DATA_IMPORT}
-import { injectStyle } from '../../js/utils/styleLoader.js';
+import { injectStyle } from '${UP}js/utils/styleLoader.js';
 
 export async function ${FEATURE_PASCAL}(main) {
   injectStyle('/${FEATURE_DIR}/css/${FEATURE_NAME}.css');
@@ -128,11 +121,11 @@ JSON_EOF
 fi
 
 echo ""
-print_success "Feature '${FEATURE_NAME}' created!"
+print_success "Feature '${FEATURE_PATH}' created!"
 echo ""
 echo -e "  ${YELLOW}Next steps:${RESET}"
 echo "    Add to router.js:"
-echo "      import { ${FEATURE_PASCAL} } from '../${FEATURE_DIR}/${FEATURE_NAME}.js';"
+echo "      import { ${FEATURE_PASCAL} } from '$(printf '../%.0s' $(seq 1 $((DEPTH + 1))))features/${FEATURE_PATH}/${FEATURE_NAME}.js';"
 echo "    Then add to routes object:"
-echo "      '/${FEATURE_NAME}': ${FEATURE_PASCAL},"
+echo "      '/${FEATURE_PATH}': ${FEATURE_PASCAL},"
 echo ""

@@ -4,7 +4,10 @@
   "private": true,
   "scripts": {
     "build:css": "tailwindcss -i ./css/global.css -o ./dist/styles.css",
-    "watch:css": "tailwindcss -i ./css/global.css -o ./dist/styles.css --watch"
+    "watch:css": "tailwindcss -i ./css/global.css -o ./dist/styles.css --watch",
+    "new:component": "bash tools/newComponent.sh",
+    "new:feature": "bash tools/newFeature.sh",
+    "new:service": "bash tools/newService.sh"
   },
   "devDependencies": {
     "@tailwindcss/cli": "^4.0.0"

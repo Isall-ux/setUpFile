@@ -7,8 +7,7 @@ source "$SCRIPT_DIR/../lib/ui.sh"
 TEMPLATES_DIR="$SCRIPT_DIR/templates"
 
 write_if_missing() {
-  local file="$1"
-  shift
+  local file="$1"; shift
   if [ ! -f "$file" ]; then
     mkdir -p "$(dirname "$file")"
     cat > "$file"
@@ -28,88 +27,95 @@ deploy_template() {
   fi
 }
 
+# ── Prompts (2 questions only) ─────────────────────────────────────────────
+echo ""
 echo -e "  ${BOLD}Vanilla JS SPA Scaffold${RESET}"
 echo ""
 
 while true; do
   read -r -p "  Project name (kebab-case): " PROJECT_NAME || true
-  if [[ "$PROJECT_NAME" =~ ^[a-z][a-z0-9]*(-[a-z0-9]+)*$ ]]; then
-    break
-  fi
+  [[ "$PROJECT_NAME" =~ ^[a-z][a-z0-9]*(-[a-z0-9]+)*$ ]] && break
   print_error "Must be kebab-case (e.g. my-project)"
 done
 
 read -r -p "  GitHub Pages base path (blank for root, e.g. /my-repo): " BASE_PATH || true
 BASE_PATH="${BASE_PATH:-}"
 
-read -r -p "  Author name: " AUTHOR || true
-AUTHOR="${AUTHOR:-}"
-
+# ── Everything below runs silently ─────────────────────────────────────────
 PROJECT_DIR="./$PROJECT_NAME"
 
-echo ""
-print_step 1 6 "Creating project structure..."
-mkdir -p "$PROJECT_DIR"
-mkdir -p "$PROJECT_DIR/assets"
-mkdir -p "$PROJECT_DIR/css"
-mkdir -p "$PROJECT_DIR/dist"
-mkdir -p "$PROJECT_DIR/data"
-mkdir -p "$PROJECT_DIR/features"
-mkdir -p "$PROJECT_DIR/components/layout"
-mkdir -p "$PROJECT_DIR/components/ui"
-mkdir -p "$PROJECT_DIR/components/shared"
-mkdir -p "$PROJECT_DIR/js/core"
-mkdir -p "$PROJECT_DIR/js/services"
-mkdir -p "$PROJECT_DIR/js/data"
-mkdir -p "$PROJECT_DIR/js/utils"
-touch "$PROJECT_DIR/dist/.gitkeep"
-touch "$PROJECT_DIR/data/.gitkeep"
-touch "$PROJECT_DIR/features/.gitkeep"
-touch "$PROJECT_DIR/components/layout/.gitkeep"
-touch "$PROJECT_DIR/components/ui/.gitkeep"
-touch "$PROJECT_DIR/components/shared/.gitkeep"
-touch "$PROJECT_DIR/js/services/.gitkeep"
-touch "$PROJECT_DIR/js/data/.gitkeep"
-touch "$PROJECT_DIR/.nojekyll"
-print_success "Project structure created"
+main() {
+  do_structure
+  do_core
+  do_utils
+  do_html_css
+  do_package
+  do_tools
+  print_summary
+}
 
-print_step 2 6 "Installing core templates..."
-deploy_template "$TEMPLATES_DIR/js/core/config.js"  "$PROJECT_DIR/js/core/config.js"
-deploy_template "$TEMPLATES_DIR/js/core/main.js"    "$PROJECT_DIR/js/core/main.js"
-deploy_template "$TEMPLATES_DIR/js/core/router.js"  "$PROJECT_DIR/js/core/router.js"
-deploy_template "$TEMPLATES_DIR/js/core/theme.js"   "$PROJECT_DIR/js/core/theme.js"
-print_success "Core files created"
+do_structure() {
+  print_step 1 6 "Creating project structure..."
+  mkdir -p "$PROJECT_DIR"/{assets,css,dist,data,features}
+  mkdir -p "$PROJECT_DIR"/components/{layout,ui,shared}
+  mkdir -p "$PROJECT_DIR"/js/{core,services,data,utils}
+  touch "$PROJECT_DIR"/dist/.gitkeep
+  touch "$PROJECT_DIR"/data/.gitkeep
+  touch "$PROJECT_DIR"/features/.gitkeep
+  touch "$PROJECT_DIR"/components/{layout,ui,shared}/.gitkeep
+  touch "$PROJECT_DIR"/js/{services,data}/.gitkeep
+  touch "$PROJECT_DIR"/.nojekyll
+}
 
-print_step 3 6 "Installing utility templates..."
-deploy_template "$TEMPLATES_DIR/js/utils/api.js"         "$PROJECT_DIR/js/utils/api.js"
-deploy_template "$TEMPLATES_DIR/js/utils/dom.js"         "$PROJECT_DIR/js/utils/dom.js"
-deploy_template "$TEMPLATES_DIR/js/utils/format.js"      "$PROJECT_DIR/js/utils/format.js"
-deploy_template "$TEMPLATES_DIR/js/utils/styleLoader.js" "$PROJECT_DIR/js/utils/styleLoader.js"
-deploy_template "$TEMPLATES_DIR/js/utils/url.js"         "$PROJECT_DIR/js/utils/url.js"
-print_success "Utility files created"
+do_core() {
+  print_step 2 6 "Installing core files..."
+  for f in config.js main.js router.js theme.js; do
+    deploy_template "$TEMPLATES_DIR/js/core/$f" "$PROJECT_DIR/js/core/$f"
+  done
+}
 
-print_step 4 6 "Installing HTML and CSS..."
-deploy_template "$TEMPLATES_DIR/index.html" "$PROJECT_DIR/index.html"
-sed -i "s|__BASE_PATH__|${BASE_PATH}|g" "$PROJECT_DIR/index.html"
-deploy_template "$TEMPLATES_DIR/css/global.css" "$PROJECT_DIR/css/global.css"
-print_success "HTML and CSS files created"
+do_utils() {
+  print_step 3 6 "Installing utilities..."
+  for f in api.js dom.js format.js styleLoader.js url.js; do
+    deploy_template "$TEMPLATES_DIR/js/utils/$f" "$PROJECT_DIR/js/utils/$f"
+  done
+}
 
-print_step 5 6 "Installing package.json..."
-deploy_template "$TEMPLATES_DIR/package.json" "$PROJECT_DIR/package.json"
-sed -i "s|__PROJECT_NAME__|${PROJECT_NAME}|g" "$PROJECT_DIR/package.json"
-sed -i "s|__AUTHOR__|${AUTHOR}|g" "$PROJECT_DIR/package.json"
-sed -i "s|__BASE_PATH__|${BASE_PATH}|g" "$PROJECT_DIR/js/core/config.js"
-sed -i "s|__PROJECT_NAME__|${PROJECT_NAME}|g" "$PROJECT_DIR/js/core/config.js"
-print_success "Package configuration created"
+do_html_css() {
+  print_step 4 6 "Installing HTML and CSS..."
+  deploy_template "$TEMPLATES_DIR/index.html"     "$PROJECT_DIR/index.html"
+  deploy_template "$TEMPLATES_DIR/css/global.css" "$PROJECT_DIR/css/global.css"
+  sed -i "s|__BASE_PATH__|${BASE_PATH}|g"         "$PROJECT_DIR/index.html"
+  sed -i "s|__BASE_PATH__|${BASE_PATH}|g"         "$PROJECT_DIR/js/core/config.js"
+}
 
-print_step 6 6 "Finalizing..."
-print_success "All done!"
+do_package() {
+  print_step 5 6 "Installing package.json..."
+  deploy_template "$TEMPLATES_DIR/package.json" "$PROJECT_DIR/package.json"
+  sed -i "s|__PROJECT_NAME__|${PROJECT_NAME}|g" "$PROJECT_DIR/package.json"
+  sed -i "s|__PROJECT_NAME__|${PROJECT_NAME}|g" "$PROJECT_DIR/js/core/config.js"
+}
 
-echo ""
-echo -e "  ${GREEN}Vanilla JS SPA scaffolded successfully!${RESET}"
-echo ""
-echo -e "  ${CYAN}Next steps:${RESET}"
-echo "    cd ${PROJECT_NAME}"
-echo "    npm install"
-echo "    npm run watch:css"
-echo ""
+do_tools() {
+  print_step 6 6 "Copying generator tools..."
+  mkdir -p "$PROJECT_DIR/tools"
+  cp -r "$SCRIPT_DIR/tools/"* "$PROJECT_DIR/tools/"
+}
+
+print_summary() {
+  echo ""
+  echo -e "  ${GREEN}${BOLD}${PROJECT_NAME}${RESET}${GREEN} scaffolded successfully!${RESET}"
+  echo ""
+  echo -e "  ${CYAN}Next steps:${RESET}"
+  echo "    cd ${PROJECT_NAME}"
+  echo "    npm install"
+  echo "    npm run watch:css"
+  echo ""
+  echo -e "  ${CYAN}Generators (run from project root):${RESET}"
+  echo "    npm run new:feature      # Scaffold a new feature"
+  echo "    npm run new:component    # Scaffold a new component"
+  echo "    npm run new:service      # Scaffold a new service"
+  echo ""
+}
+
+main

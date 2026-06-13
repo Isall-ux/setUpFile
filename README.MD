@@ -160,3 +160,82 @@ npm run docker         # build image
 npm run docker:up      # start containers
 npm run docker:down    # stop containers
 ```
+
+---
+
+## Vanilla JS SPA
+
+Pilih **Vanilla JS** dari menu scaffold untuk bikin Single Page App tanpa framework.
+
+### Hasil Folder Structure
+
+```
+<project>/
+├── assets/
+├── components/
+│   ├── layout/
+│   ├── ui/
+│   └── shared/
+├── css/
+│   └── global.css
+├── data/
+├── dist/
+├── features/
+├── js/
+│   ├── core/
+│   │   ├── config.js
+│   │   ├── main.js
+│   │   ├── router.js
+│   │   └── theme.js
+│   ├── data/
+│   ├── services/
+│   └── utils/
+│       ├── api.js
+│       ├── dom.js
+│       ├── format.js
+│       ├── styleLoader.js
+│       └── url.js
+├── tools/
+│   ├── newComponent.sh
+│   ├── newFeature.sh
+│   └── newService.sh
+├── index.html
+└── package.json
+```
+
+### Generator Tools
+
+Tools berikut otomatis tercopy ke folder `tools/` dan bisa dipanggil lewat npm:
+
+```bash
+npm run new:component    # Bikin komponen UI (PascalCase, misal UserCard)
+npm run new:feature      # Bikin fitur baru (kebab-case, misal user-profile)
+npm run new:service      # Bikin service singleton (camelCase, misal bookmarks)
+```
+
+Semua tool bersifat interaktif — bakal nanya nama, kategori, dan opsi lainnya.
+
+#### new:component
+
+- Nama harus **PascalCase** (contoh: `Navbar`, `UserCard`)
+- Pilih kategori: `layout`, `ui`, atau `shared`
+- Hasil: `components/<kategori>/<nama>/` berisi `.js` + `.css`
+
+#### new:feature
+
+- Nama path dengan **kebab-case**, bisa nested dengan `/` (contoh: `blog`, `blog/post/comments`)
+- Opsi bikin file data JSON sendiri atau pake yang udah ada
+- Hasil: `features/<path>/` berisi `.js`, `.css`, dan opsi helper stubs
+- Import path dan route otomatis menyesuaikan kedalaman nesting
+
+#### new:service
+
+- Nama harus **camelCase** (contoh: `bookmarks`, `auth`)
+- Hasil: `js/services/<nama>.js` — singleton class dengan method `getAll()` dan `create()`
+
+### Command Lain
+
+```bash
+npm run build:css     # Build Tailwind CSS
+npm run watch:css     # Watch mode Tailwind CSS
+```
