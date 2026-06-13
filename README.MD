@@ -1,39 +1,66 @@
-# Hallo kawan!! ini setUp framework pribadi ku
+# scaffold — Express Project Scaffolder
 
-Tujuan pembuatan dari repo ini adalah ribetnya mulai dari awal bikin folder, file, dll di Express — jadi saya research dan nemu cara otomisasi nya dengan Node. Semoga membantu!
+Bosan setiap kali mulai project Express harus bikin folder, file, config, dan instal dependencies dari nol?  
+Ini toolsnya — sekali install, tinggal jalanin `scaffold` dari direktori mana aja.
 
 ---
 
-## Set Up Express
+## Install
 
-Clone repo ini terlebih dahulu, pastikan kamu berada di direktori yang sama dengan file `setUp.js`, lalu jalankan:
+### Lewat `curl` (recommended, ga perlu `git`)
 
 ```bash
-node setUp.js
+bash <(curl -s https://raw.githubusercontent.com/aussenseiter-VsRB/setUpFile/main/install.sh)
 ```
 
-Setelah dijalankan, kamu akan diminta memilih:
+Installer akan:
+- Download repo sebagai zip via `curl`
+- Extract ke `~/.scaffold`
+- Set permission
+- Daftarin alias `scaffold` di `~/.zshrc` / `~/.bashrc` / `config.fish`
+- Kalau `~/.scaffold` udah ada, bakal nanya update atau skip
 
-1. **ORM** yang ingin digunakan:
+Selesai, jalanin ini biar alias aktif:
 
+```bash
+source ~/.zshrc           # atau ~/.bashrc / config.fish
 ```
-🔧 Express Project Setup
 
+### Manual (clone)
+
+```bash
+git clone https://github.com/aussenseiter-VsRB/setUpFile.git
+cd setUpFile/express
+```
+
+Terus tinggal jalanin langsung:
+```bash
+bash scaffold.sh
+```
+
+---
+
+## Cara Pake
+
+Jalanin `scaffold` dari folder project yang mau di-setup:
+
+```bash
+scaffold
+```
+
+Bakal nanya dua hal:
+
+1. **ORM** yang dipake:
+```
 Select an ORM:
   1. Prisma
   2. Sequelize
   3. Mongoose
-
-Enter choice (1-3):
 ```
 
-2. **Docker support** (opsional):
+2. **Docker** — mau include `Dockerfile` + `docker-compose.yml`? `y` / `n`
 
-```
-Do you want to include a Dockerfile? (y/n):
-```
-
-Jika memilih `y`, akan dibuatkan `Dockerfile`, `docker-compose.yml`, dan `.dockerignore`.
+Abis itu semua file, folder, dependencies, config database kepasang otomatis.
 
 ---
 
@@ -53,15 +80,14 @@ tools/
 ├── createModule.js
 └── deleteModule.js
 prisma/
-└── schema.prisma        ← hanya jika memilih Prisma
+└── schema.prisma        ← hanya kalau pilih Prisma
 .env
 .env.example
 .gitignore
 package.json
-setUp.js
-Dockerfile              ← hanya jika memilih Docker
-docker-compose.yml      ← hanya jika memilih Docker
-.dockerignore           ← hanya jika memilih Docker
+Dockerfile              ← hanya kalau pilih Docker
+docker-compose.yml      ← hanya kalau pilih Docker
+.dockerignore           ← hanya kalau pilih Docker
 ```
 
 ---
@@ -71,13 +97,14 @@ docker-compose.yml      ← hanya jika memilih Docker
 ### Membuat feature module
 
 ```bash
-npm run module <namaFile>             # membuat semua file sekaligus
-npm run module <namaFile> controller  # hanya membuat controller
-npm run module <namaFile> routes      # hanya membuat routes
-npm run module <namaFile> model       # hanya membuat model (Sequelize & Mongoose saja)
+npm run module <namaFile>             # bikin semua file (model, service, controller, routes)
+npm run module <namaFile> controller  # cuma controller
+npm run module <namaFile> routes      # cuma routes
+npm run module <namaFile> model       # cuma model (Sequelize & Mongoose)
 ```
 
-> **Prisma:** tidak ada `model` file yang di-generate karena model didefinisikan langsung di `prisma/schema.prisma`. Setelah scaffold, tambahkan model ke schema lalu jalankan:
+> **Prisma:** model ga di-generate karena didefinisikan di `prisma/schema.prisma`.  
+> Abis nambah model di schema, jalankan:
 > ```bash
 > npx prisma migrate dev --name add_<namaFile>
 > ```
@@ -110,7 +137,7 @@ Sesuaikan isi `.env` dengan konfigurasi database kamu sebelum menjalankan server
 
 ## Docker Support
 
-Jika kamu memilih untuk menyertakan Docker saat setup, file berikut akan dibuat:
+Kalau milih include Docker, file berikut dibuat:
 
 ```
 Dockerfile
@@ -118,9 +145,7 @@ docker-compose.yml
 .dockerignore
 ```
 
-### Database Services via Docker Compose
-
-Docker Compose sudah dikonfigurasi dengan service database sesuai ORM yang dipilih:
+Database service sesuai ORM:
 
 | ORM | Service | Port |
 |---|---|---|
@@ -131,26 +156,7 @@ Docker Compose sudah dikonfigurasi dengan service database sesuai ORM yang dipil
 ### Command Docker
 
 ```bash
-npm run docker         # build Docker image
+npm run docker         # build image
 npm run docker:up      # start containers
-npm run docker:down   # stop containers
+npm run docker:down    # stop containers
 ```
-
-### Manual Docker Commands
-
-```bash
-# Build image
-docker build -t myapp .
-
-# Run container
-docker run -p 5000:5000 myapp
-
-# Start database only
-docker compose up -d postgres   # untuk Prisma/Sequelize
-docker compose up -d mongodb    # untuk Mongoose
-
-# Stop database
-docker compose down
-```
-
-> **Catatan:** Sesuaikan `DATABASE_URL` atau `DB_HOST` di `.env` ke `localhost` jika database berjalan di container terpisah, atau ke nama service Docker (`postgres`, `mongodb`) jika keduanya berjalan di docker-compose.
